@@ -155,7 +155,12 @@
 
 
 - name: Execute the OSA AIO bootstrap
-  include: "{{ lookup('env', 'OA_DIR') }}/tests/bootstrap-aio.yml"
+  hosts: localhost
+  user: root
+  tasks:
+   - include: "{{ lookup('env', 'OA_DIR') }}/tests/bootstrap-aio.yml"
+     when:
+       - lookup ('env', 'TARGET') == "aio"
   vars:
     bootstrap_host_apt_distribution_suffix_list: "{{ (lookup('env', 'RPCO_APT_ARTIFACTS_AVAILABLE') | bool) | ternary([], ['updates', 'backports']) }}"
     scenario: "{% if lookup('env', 'DEPLOY_MAGNUM') == 'yes' %}magnum{% else %}{{ lookup('env', 'DEPLOY_CEPH') |bool |ternary('ceph','swift') }}{%endif%}"
