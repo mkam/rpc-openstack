@@ -147,6 +147,10 @@
         - TARGET is defined
         - TARGET in target_user_variables_overrides
 
+    - name: Show final user_variables_overrides
+      debug:
+        var: user_variables_overrides
+
   vars:
     rpco_deploy_hardening: "{{ lookup('env', 'DEPLOY_HARDENING') }}"
     TRIGGER: "{{ lookup('env', 'TRIGGER')}}"
