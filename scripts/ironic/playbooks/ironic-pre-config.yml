@@ -49,65 +49,35 @@
         - br-tftp
         - br-ironic-ipmi
 
-    - name: Define networks for ironic to use
+    - name: Configure ironic network variables
       config_template:
         src: "/etc/openstack_deploy/openstack_user_config.yml"
         dest: "/etc/openstack_deploy/openstack_user_config.yml"
         owner: "root"
         group: "root"
         mode: "0644"
-        config_overrides: "{{ cidr_networks_ironic }}"
+        config_overrides: "{{ ironic_network_config }}"
         config_type: "yaml"
         list_extend: true
 
-    - name: Add IPs to used_ips list
-      config_template:
-        src: "/etc/openstack_deploy/openstack_user_config.yml"
-        dest: "/etc/openstack_deploy/openstack_user_config.yml"
-        owner: "root"
-        group: "root"
-        mode: "0644"
-        config_overrides: "{{ used_ips_ironic }}"
-        config_type: "yaml"
-        list_extend: true
-
-    - name: Setup global overrides
-      config_template:
-        src: "/etc/openstack_deploy/openstack_user_config.yml"
-        dest: "/etc/openstack_deploy/openstack_user_config.yml"
-        owner: "root"
-        group: "root"
-        mode: "0644"
-        config_overrides: "{{ ironic_networks }}"
-        config_type: "yaml"
-        list_extend: true
-
-    - name: Setup endpoints for swift/ironic health checks
+    - name: Configure ironic OSA variables
       config_template:
         src: "/etc/openstack_deploy/user_osa_variables_overrides.yml"
         dest: "/etc/openstack_deploy/user_osa_variables_overrides.yml"
         owner: "root"
         group: "root"
         mode: "0644"
-        config_overrides: "{{ ironic_endpoint_config }}"
-        config_type: "yaml"
-
-    - name: Configure neutron DHCP to be non-authorative
-      config_template:
-        src: "/etc/openstack_deploy/user_osa_variables_overrides.yml"
-        dest: "/etc/openstack_deploy/user_osa_variables_overrides.yml"
-        owner: "root"
-        group: "root"
-        mode: "0644"
-        config_overrides: "{{ ironic_neutron_dhcp_config }}"
+        config_overrides: "{{ ironic_osa_config }}"
         config_type: "yaml"
 
   vars:
-    cidr_networks_ironic:
+    ironic_network_config:
       cidr_networks:
-           tftp: "172.29.232.0/22"
-           ironic-ipmi: "172.29.228.0/22"
-    ironic_networks:
+        tftp: "172.29.232.0/22"
+        ironic-ipmi: "172.29.228.0/22"
+      used_ips:
+        - "172.29.232.1,172.29.232.50"
+        - "172.29.228.1,172.29.228.50"
       global_overrides:
         provider_networks:
           - network:
@@ -129,17 +99,12 @@
               group_binds:
               - neutron_linuxbridge_agent
               - ironic_all
-    ironic_endpoint_config:
+    ironic_osa_config:
       extra_lb_vip_addresses:
        - "{{ external_lb_vip_address }}"
       ironic_openstack_api_url: "{{ external_lb_vip_address }}:{{ ironic_service_port }}"
       ironic_swift_endpoint: "{{ external_lb_vip_address }}:8080"
-    ironic_neutron_dhcp_config:
       neutron_dhcp_config:
         dhcp-option-force: "26,1500"
         dhcp-ignore: "tag:!known"
         log-facility: "/var/log/neutron/dnsmasq.log"
-    used_ips_ironic:
-      used_ips:
-        - "172.29.232.1,172.29.232.50"
-        - "172.29.228.1,172.29.228.50"
