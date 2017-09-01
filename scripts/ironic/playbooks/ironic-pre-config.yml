@@ -17,7 +17,8 @@
   tasks:
     - name: Add config in osa_interfaces.cfg.j2
       blockinfile:
-        dest: /etc/network/interfaces.d/osa_interfaces.cfg
+        dest: /etc/network/interfaces.d/osa_ironic_interfaces.cfg
+        create: yes
         block: |
           auto eth2
           auto br-ironic-ipmi
