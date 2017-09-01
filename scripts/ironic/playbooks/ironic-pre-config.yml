@@ -15,6 +15,33 @@
 - name: Pre install config for ironic
   hosts: localhost
   tasks:
+    - name: Add config in osa_interfaces.cfg.j2
+      blockinfile:
+        dest: /etc/network/interfaces.d/osa_ironic_interfaces.cfg
+        block: |
+          auto eth2
+          auto br-ironic-ipmi
+          iface br-ironic-ipmi inet static
+              bridge_ports eth2
+              bridge_stp off
+              bridge_waitport 10
+              bridge_fd 0
+              offload-sg off
+              address 172.29.228.100
+              netmask 255.255.252.0
+
+          auto eth3
+          iface eth3 inet manual
+          auto br-tftp
+          iface br-tftp inet static
+              bridge_stp off
+              bridge_waitport 10
+              bridge_fd 0
+              offload-sg off
+              bridge_ports eth3
+              address 172.29.232.100
+              netmask 255.255.252.0
+
     - name: Start the ironic network interfaces
       command: "ifup {{ item }}"
       with_items:
@@ -23,8 +50,8 @@
 
     - name: Define networks for ironic to use
       config_template:
-        src: "../../openstack-ansible/etc/openstack_deploy/openstack_user_config.yml.aio"
-        dest: "../../openstack-ansible/etc/openstack_deploy/openstack_user_config.yml.aio"
+        src: "/etc/openstack_deploy/openstack_user_config.yml"
+        dest: "/etc/openstack_deploy/openstack_user_config.yml"
         owner: "root"
         group: "root"
         mode: "0644"
@@ -34,8 +61,8 @@
 
     - name: Add IPs to used_ips list
       config_template:
-        src: "../../openstack-ansible/etc/openstack_deploy/openstack_user_config.yml.aio"
-        dest: "../../openstack-ansible/etc/openstack_deploy/openstack_user_config.yml.aio"
+        src: "/etc/openstack_deploy/openstack_user_config.yml"
+        dest: "/etc/openstack_deploy/openstack_user_config.yml"
         owner: "root"
         group: "root"
         mode: "0644"
@@ -45,8 +72,8 @@
 
     - name: Setup global overrides
       config_template:
-        src: "../../openstack-ansible/etc/openstack_deploy/openstack_user_config.yml.aio"
-        dest: "../../openstack-ansible/etc/openstack_deploy/openstack_user_config.yml.aio"
+        src: "/etc/openstack_deploy/openstack_user_config.yml"
+        dest: "/etc/openstack_deploy/openstack_user_config.yml"
         owner: "root"
         group: "root"
         mode: "0644"
@@ -56,8 +83,8 @@
 
     - name: Setup endpoints for swift/ironic health checks
       config_template:
-        src: "../etc/openstack_deploy/user_osa_variables_overrides.yml"
-        dest: "../etc/openstack_deploy/user_osa_variables_overrides.yml"
+        src: "/etc/openstack_deploy/user_osa_variables_overrides.yml"
+        dest: "/etc/openstack_deploy/user_osa_variables_overrides.yml"
         owner: "root"
         group: "root"
         mode: "0644"
@@ -66,8 +93,8 @@
 
     - name: Configure neutron DHCP to be non-authorative
       config_template:
-        src: "../etc/openstack_deploy/user_osa_variables_overrides.yml"
-        dest: "../etc/openstack_deploy/user_osa_variables_overrides.yml"
+        src: "/etc/openstack_deploy/user_osa_variables_overrides.yml"
+        dest: "/etc/openstack_deploy/user_osa_variables_overrides.yml"
         owner: "root"
         group: "root"
         mode: "0644"

@@ -28,24 +28,13 @@ source ${BASE_DIR}/scripts/functions.sh
 # Check the openstack-ansible submodule status
 check_submodule_status
 
-export DEPLOY_IRONIC="yes"
-export DEPLOY_AIO="yes"
-# begin the ansible setup
-${BASE_DIR}/scripts/bootstrap-ansible.sh
-${BASE_DIR}/scripts/bootstrap-aio.sh
-sed -i "s/aio1/$(hostname)/" /etc/openstack_deploy/openstack_user_config.yml
-sed -i "s/aio1/$(hostname)/" /etc/openstack_deploy/conf.d/*.yml
-# drop interface config for ironic
-openstack-ansible ${BASE_DIR}/scripts/setup-ironic-networking.yml
-${BASE_DIR}/scripts/bootstrap-aio.sh
-# replace aio1 with the hostname
-sed -i "s/aio1/$(hostname)/" /etc/openstack_deploy/openstack_user_config.yml
-sed -i "s/aio1/$(hostname)/" /etc/openstack_deploy/conf.d/*.yml
-# run pre-install config for ironic
-openstack-ansible ${RPCD_DIR}/playbooks/ironic-pre-config.yml
-# deploy RPC
+# Ansible and AIO setup
+DEPLOY_IRONIC="yes" DEPLOY_AIO="yes" DEPLOY_RPC="no" DEPLOY_OA="no" ${BASE_DIR}/scripts/deploy.sh
+# Pre-deployment configuration for ironic
+openstack-ansible ${BASE_DIR}/scripts/ironic/playbooks/ironic-pre-config.yml
+# Deploy RPC
 ${BASE_DIR}/scripts/deploy.sh
-# do post ironic install config
-openstack-ansible ${RPCD_DIR}/playbooks/ironic-post-install-config.yml
-# re-run ironic install to include the post-config
-openstack-ansible ${RPCD_DIR}/openstack/playbooks/os-ironic-install.yml
+# Post-deployment configuration for ironic
+openstack-ansible ${BASE_DIR}/scripts/ironic/playbooks/ironic-post-install-config.yml
+# Re-run ironic installation to include the post-config
+openstack-ansible ${BASE_DIR}/openstack/playbooks/os-ironic-install.yml
