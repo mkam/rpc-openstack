@@ -108,3 +108,5 @@
         dhcp-option-force: "26,1500"
         dhcp-ignore: "tag:!known"
         log-facility: "/var/log/neutron/dnsmasq.log"
+      nova_scheduler_use_baremetal_filters: False
+      ironic_openstack_driver_list: "agent_ipmitool, fake"
