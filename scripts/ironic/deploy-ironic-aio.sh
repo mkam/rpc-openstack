@@ -37,4 +37,4 @@ ${BASE_DIR}/scripts/deploy.sh
 # Post-deployment configuration for ironic
 openstack-ansible ${BASE_DIR}/scripts/ironic/playbooks/ironic-post-install-config.yml
 # Re-run ironic installation to include the post-config
-openstack-ansible ${BASE_DIR}/openstack/playbooks/os-ironic-install.yml
+openstack-ansible ${OA_DIR}/playbooks/os-ironic-install.yml
